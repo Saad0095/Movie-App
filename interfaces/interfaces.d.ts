@@ -1,18 +1,22 @@
-interface Movie {
+export interface Movie {
   id: number;
   title: string;
-  adult: boolean;
-  backdrop_path: string;
-  genre_ids: number[];
-  original_language: string;
-  original_title: string;
-  overview: string;
-  popularity: number;
-  poster_path: string;
-  release_date: string;
-  video: boolean;
+  poster_path: string | null;
   vote_average: number;
-  vote_count: number;
+  // id: number;
+  // title: string;
+  // adult: boolean;
+  // backdrop_path: string;
+  // genre_ids: number[];
+  // original_language: string;
+  // original_title: string;
+  // overview: string;
+  // popularity: number;
+  // poster_path: string;
+  // release_date: string;
+  // video: boolean;
+  // vote_average: number;
+  // vote_count: number;
 }
 
 interface TrendingMovie {
@@ -20,10 +24,10 @@ interface TrendingMovie {
   movie_id: number;
   title: string;
   count: number;
-  poster_url: string;
+  poster_path: string;
 }
 
-interface MovieDetails {
+export interface MovieDetails {
   adult: boolean;
   backdrop_path: string | null;
   belongs_to_collection: {
@@ -71,7 +75,7 @@ interface MovieDetails {
   vote_count: number;
 }
 
-interface TrendingCardProps {
+export interface TrendingCardProps {
   movie: TrendingMovie;
   index: number;
 }

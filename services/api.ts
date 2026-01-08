@@ -1,11 +1,11 @@
-import { EXPO_PUBLIC_MOVIE_API_KEY } from "@env";
+import { Movie, MovieDetails } from "@/interfaces/interfaces";
 
 export const TMDB_CONFIG = {
   BASE_URL: "https://api.themoviedb.org/3",
-  API_KEY: EXPO_PUBLIC_MOVIE_API_KEY,
+  API_KEY: process.env.EXPO_PUBLIC_MOVIE_API_KEY,
   headers: {
     accept: "application/json",
-    Authorization: `Bearer ${EXPO_PUBLIC_MOVIE_API_KEY}`,
+    // Authorization: `Bearer ${EXPO_PUBLIC_MOVIE_API_KEY}`,
   },
 };
 
