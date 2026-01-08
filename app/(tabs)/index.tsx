@@ -1,6 +1,6 @@
 import MovieCard from "@/components/MovieCard";
 import { icons } from "@/constants/icons";
-import { TrendingMovie } from "@/interfaces/interfaces";
+import { Movie, TrendingMovie } from "@/interfaces/interfaces";
 import { fetchMovies } from "@/services/api";
 import { getTrendingMovies } from "@/services/appwrite";
 import { useFocusEffect } from "@react-navigation/native";
@@ -14,12 +14,6 @@ import {
   View,
 } from "react-native";
 
-interface Movie {
-  id: number;
-  title: string;
-  poster_path: string | null;
-  vote_average: number;
-}
 
 export default function Index() {
   const router = useRouter()
