@@ -25,6 +25,7 @@ interface TrendingMovie {
   title: string;
   count: number;
   poster_path: string;
+  vote_average: number;
 }
 
 export interface MovieDetails {

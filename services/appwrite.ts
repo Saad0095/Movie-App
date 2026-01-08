@@ -34,6 +34,7 @@ export const updateSearchCount = async (query: string, movie: Movie) => {
         title: movie.title,
         count: 1,
         poster_path: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+        vote_average: movie.vote_average
       });
     }
   } catch (error) {

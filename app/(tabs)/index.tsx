@@ -3,7 +3,9 @@ import { icons } from "@/constants/icons";
 import { TrendingMovie } from "@/interfaces/interfaces";
 import { fetchMovies } from "@/services/api";
 import { getTrendingMovies } from "@/services/appwrite";
-import { useEffect, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import { useRouter } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -20,27 +22,30 @@ interface Movie {
 }
 
 export default function Index() {
+  const router = useRouter()
   const [movies, setMovies] = useState<Movie[]>([]);
   const [trendingMovies, setTrendingMovies] = useState<TrendingMovie[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingTrending, setLoadingTrending] = useState(false);
 
-  useEffect(() => {
-    const fetchTrending = async () => {
-      try {
-        setLoadingTrending(true);
-        const data = await getTrendingMovies();
-        if (data && data.length > 0) {
-          setTrendingMovies(data);
+  useFocusEffect(
+    useCallback(() => {
+      const fetchTrending = async () => {
+        try {
+          setLoadingTrending(true);
+          const data = await getTrendingMovies();
+          if (data && data.length > 0) {
+            setTrendingMovies(data);
+          }
+        } catch (error) {
+          console.error("Error fetching trending movies:", error);
+        } finally {
+          setLoadingTrending(false);
         }
-      } catch (error) {
-        console.error("Error fetching trending movies:", error);
-      } finally {
-        setLoadingTrending(false);
-      }
-    };
-    fetchTrending();
-  }, []);
+      };
+      fetchTrending();
+    }, [])
+  );
 
   const fetchLatest = async () => {
     try {
@@ -88,7 +93,7 @@ export default function Index() {
                     id={item.movie_id}
                     title={item.title}
                     poster_path={item.poster_path}
-                    vote_average={0}
+                    vote_average={item.vote_average}
                   />
                 )}
                 contentContainerStyle={{ gap: 8, paddingRight: 16 }}
