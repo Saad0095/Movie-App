@@ -1,5 +1,4 @@
 import MovieCard from "@/components/MovieCard";
-import SearchBar from "@/components/SearchBar";
 import { icons } from "@/constants/icons";
 import { TrendingMovie } from "@/interfaces/interfaces";
 import { fetchMovies } from "@/services/api";
@@ -9,7 +8,6 @@ import {
   ActivityIndicator,
   FlatList,
   Image,
-  ScrollView,
   Text,
   View,
 } from "react-native";
@@ -22,92 +20,98 @@ interface Movie {
 }
 
 export default function Index() {
-  const [search, setSearch] = useState("");
   const [movies, setMovies] = useState<Movie[]>([]);
   const [trendingMovies, setTrendingMovies] = useState<TrendingMovie[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingTrending, setLoadingTrending] = useState(false);
 
   useEffect(() => {
-    const getTrending = async () => {
+    const fetchTrending = async () => {
       try {
-        const data = await getTrendingMovies()
+        setLoadingTrending(true);
+        const data = await getTrendingMovies();
         if (data && data.length > 0) {
-          setTrendingMovies(data)
-        } else {
-          console.log("No trending movies data or empty array");
+          setTrendingMovies(data);
         }
       } catch (error) {
-        console.error("Error in getTrending:", error);
-      }
-    }
-    getTrending();
-  }, [])
-  useEffect(() => {
-    const timeout = setTimeout(async () => {
-      try {
-        setLoading(true);
-        const data = await fetchMovies({ query: search });
-        setMovies(data);
-      } catch (err) {
-        console.error(err);
+        console.error("Error fetching trending movies:", error);
       } finally {
-        setLoading(false);
+        setLoadingTrending(false);
       }
-    }, 500);
+    };
+    fetchTrending();
+  }, []);
 
-    return () => clearTimeout(timeout);
-  }, [search]);
+  const fetchLatest = async () => {
+    try {
+      setLoading(true);
+      const data = await fetchMovies({ query: "" });
+      setMovies(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchLatest()
+  }, [])
 
   return (
     <View className="flex-1 bg-primary px-5 py-5">
-      <ScrollView>
-        <Image source={icons.logo} className="w-12 h-12 self-center my-6" />
+      <FlatList
+        data={movies}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => <MovieCard {...item} />}
+        numColumns={3}
+        columnWrapperStyle={{ justifyContent: "space-between", marginBottom: 16 }}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 20 }}
+        ListHeaderComponent={
+          <>
+            <Image source={icons.logo} className="w-12 h-12 self-center my-6" />
 
-        <SearchBar search={search} onChangeText={setSearch} />
+            <Text className="text-white text-2xl font-bold mt-6 mb-4">
+              Trending Movies
+            </Text>
 
-        <Text className="text-white text-2xl font-bold mt-6 mb-4">
-          Trending Movies
-        </Text>
+            {loadingTrending ? (
+              <ActivityIndicator size="small" color="#AB8BFF" />
+            ) : trendingMovies.length > 0 ? (
+              <FlatList
+                horizontal
+                data={trendingMovies}
+                keyExtractor={(item) => item.movie_id.toString()}
+                renderItem={({ item }) => (
+                  <MovieCard
+                    id={item.movie_id}
+                    title={item.title}
+                    poster_path={item.poster_path}
+                    vote_average={0}
+                  />
+                )}
+                contentContainerStyle={{ gap: 8, paddingRight: 16 }}
+                showsHorizontalScrollIndicator={false}
+                scrollEventThrottle={16}
+              />
+            ) : (
+              <Text className="text-white text-center mt-2">No trending movies</Text>
+            )}
 
-        <FlatList
-          data={trendingMovies}
-          keyExtractor={(item) => item.movie_id.toString()}
-          renderItem={({ item }) => (
-            <MovieCard 
-              id={item.movie_id}
-              title={item.title}
-              poster_path={item.poster_path}
-              vote_average={0}
-            />
-          )}
-          numColumns={3}
-          columnWrapperStyle={{
-            justifyContent: "space-between",
-            marginBottom: 16,
-          }}
-          showsVerticalScrollIndicator={false}
-        />
+            <Text className="text-white text-2xl font-bold mt-6 mb-4">
+              Latest Movies
+            </Text>
 
-        <Text className="text-white text-2xl font-bold mt-6 mb-4">
-          Latest Movies
-        </Text>
-
-        {loading ? (
-          <ActivityIndicator size="large" color="#AB8BFF" />
-        ) : (
-          <FlatList
-            data={movies}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => <MovieCard {...item} />}
-            numColumns={3}
-            columnWrapperStyle={{
-              justifyContent: "space-between",
-              marginBottom: 16,
-            }}
-            showsVerticalScrollIndicator={false}
-          />
-        )}
-      </ScrollView>
+            {loading && <ActivityIndicator size="large" color="#AB8BFF" className="mb-4" />}
+          </>
+        }
+        ListEmptyComponent={
+          !loading ? (
+            <Text className="text-white text-center mt-10 text-lg">No movies found</Text>
+          ) : null
+        }
+      />
     </View>
   );
 }
